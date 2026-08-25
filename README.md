@@ -1,4 +1,4 @@
-# secoya-trust-record
+
 # secoya-trust-record / 3 RC1 - Independent Cryptographic Evidence Records
 
 The authoritative specification is [`SECOYA-TRUST-RECORD-RC1.md`](./SECOYA-TRUST-RECORD-RC1.md), the frozen ratified standard for `secoya-trust-record/3`. All other files in this repository are subordinate references. If any subordinate file conflicts with the prose authority, the prose authority prevails.
