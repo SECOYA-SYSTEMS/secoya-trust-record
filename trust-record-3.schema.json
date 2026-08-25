@@ -1,0 +1,171 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://secoya.systems/spec/trust-record-3.schema.json",
+  "title": "Secoya Trust Record /3 RC1",
+  "description": "Subordinate structural aid. SECOYA-TRUST-RECORD-RC1.md is normative; if this schema conflicts with the prose authority, the prose authority prevails. Strict parsing, I-JSON, duplicate-name rejection and defensive limits also remain normative requirements.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protected", "payload", "signatures"],
+  "properties": {
+    "protected": { "$ref": "#/definitions/recordProtected" },
+    "payload": { "$ref": "#/definitions/jsonValue" },
+    "signatures": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": { "$ref": "#/definitions/signature" }
+    }
+  },
+  "definitions": {
+    "identifier": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100000,
+      "pattern": "^(?:[A-Za-z0-9][A-Za-z0-9._:-]*|ns:[^/\\s]+/[^/\\s]+)$"
+    },
+    "base64url": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100000,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.[0-9]{3}Z$"
+    },
+    "jsonValue": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string", "maxLength": 100000 },
+        { "type": "array", "items": { "$ref": "#/definitions/jsonValue" } },
+        {
+          "type": "object",
+          "maxProperties": 1000,
+          "propertyNames": { "not": { "enum": ["__proto__", "constructor", "prototype"] } },
+          "additionalProperties": { "$ref": "#/definitions/jsonValue" }
+        }
+      ]
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "acceptedClassical", "acceptedPostQuantum"],
+      "properties": {
+        "mode": { "enum": ["classical", "pq-observe", "hybrid-preferred", "hybrid-required", "pq-only"] },
+        "acceptedClassical": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "const": "Ed25519" }
+        },
+        "acceptedPostQuantum": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "const": "ML-DSA-65" }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "tenant", "workflow"],
+      "properties": {
+        "environment": { "$ref": "#/definitions/identifier" },
+        "tenant": { "type": ["string", "null"], "maxLength": 100000 },
+        "workflow": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["definition", "instance"],
+          "properties": {
+            "definition": { "$ref": "#/definitions/identifier" },
+            "instance": { "$ref": "#/definitions/identifier" }
+          }
+        },
+        "audience": { "type": "string", "minLength": 1, "maxLength": 100000 },
+        "extensions": {
+          "type": "object",
+          "propertyNames": { "pattern": "^ns:[^/\\s]+/[^/\\s]+$" },
+          "additionalProperties": { "$ref": "#/definitions/jsonValue" }
+        }
+      }
+    },
+    "recordProtected": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "evidenceUnitType",
+        "canonicalization",
+        "digest",
+        "policy",
+        "purpose",
+        "context",
+        "recordId",
+        "nonce",
+        "predecessor"
+      ],
+      "properties": {
+        "format": { "const": "secoya-trust-record/3" },
+        "evidenceUnitType": { "$ref": "#/definitions/identifier" },
+        "canonicalization": { "const": "RFC8785" },
+        "digest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["algorithm", "value"],
+          "properties": {
+            "algorithm": { "const": "SHA-384" },
+            "value": { "$ref": "#/definitions/base64url" }
+          }
+        },
+        "policy": { "$ref": "#/definitions/policy" },
+        "purpose": { "$ref": "#/definitions/identifier" },
+        "context": { "$ref": "#/definitions/context" },
+        "recordId": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "scope"],
+          "properties": {
+            "id": { "$ref": "#/definitions/identifier" },
+            "scope": { "$ref": "#/definitions/identifier" }
+          }
+        },
+        "nonce": { "type": ["string", "null"], "maxLength": 100000 },
+        "predecessor": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["digestAlgorithm", "value"],
+              "properties": {
+                "digestAlgorithm": { "const": "SHA-384" },
+                "value": { "$ref": "#/definitions/base64url" }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protected", "signature"],
+      "properties": {
+        "protected": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["algorithm", "keyId", "authorityId", "createdAt"],
+          "properties": {
+            "algorithm": { "enum": ["Ed25519", "ML-DSA-65"] },
+            "keyId": { "$ref": "#/definitions/identifier" },
+            "authorityId": { "$ref": "#/definitions/identifier" },
+            "createdAt": { "$ref": "#/definitions/timestamp" },
+            "keyFingerprint": { "$ref": "#/definitions/base64url" }
+          }
+        },
+        "signature": { "$ref": "#/definitions/base64url" }
+      }
+    }
+  }
+}
