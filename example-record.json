@@ -1,0 +1,64 @@
+{
+  "protected": {
+    "format": "secoya-trust-record/3",
+    "evidenceUnitType": "decision",
+    "canonicalization": "RFC8785",
+    "digest": {
+      "algorithm": "SHA-384",
+      "value": "0Cw99b-N3WOELPp2uMEu91_zQdvYk7p9wIIBY4EE4EQ-9JuGU3bjVLZE2e3cTR5q"
+    },
+    "policy": {
+      "mode": "hybrid-preferred",
+      "acceptedClassical": ["Ed25519"],
+      "acceptedPostQuantum": ["ML-DSA-65"]
+    },
+    "purpose": "audit-evidence",
+    "context": {
+      "environment": "demonstration",
+      "tenant": null,
+      "workflow": {
+        "definition": "credit-decision",
+        "instance": "loan-application-4912"
+      },
+      "audience": "independent-reviewer"
+    },
+    "recordId": {
+      "id": "rec-example-credit-4912",
+      "scope": "credit-decisions"
+    },
+    "nonce": null,
+    "predecessor": null
+  },
+  "payload": {
+    "amount": 125000,
+    "currency": "GBP",
+    "decision": "approved",
+    "event": "credit-decision",
+    "exampleNotice": "Illustrative record; signatures are placeholders and are not valid cryptographic proof.",
+    "model": {
+      "name": "credit-model",
+      "version": "2.1"
+    },
+    "subject": "loan-application-4912"
+  },
+  "signatures": [
+    {
+      "protected": {
+        "algorithm": "Ed25519",
+        "keyId": "example-ed25519-key",
+        "authorityId": "example-credit-authority",
+        "createdAt": "2026-08-25T12:00:00.000Z"
+      },
+      "signature": "RVhBTVBMRV9QTEFDRUhPTERFUl9OT1RfVkFMSURfRUQyNTUxOV9TSUdOQVRVUkU"
+    },
+    {
+      "protected": {
+        "algorithm": "ML-DSA-65",
+        "keyId": "example-ml-dsa-65-key",
+        "authorityId": "example-credit-authority",
+        "createdAt": "2026-08-25T12:00:00.000Z"
+      },
+      "signature": "RVhBTVBMRV9QTEFDRUhPTERFUl9OT1RfVkFMSURfTUxfRFNBXzY1X1NJR05BVFVSRQ"
+    }
+  ]
+}
